@@ -85,7 +85,7 @@ export default function WorkPage() {
   }
 
   function handleBacking() {
-    setSelected(null);
+    setSelected(null); // Reset selected state
   }
 
   useEffect(() => {
@@ -95,18 +95,23 @@ export default function WorkPage() {
       console.log("Connected to socket server");
     });
 
-    // Listen for service updates
+    // Listen for transactionFetched event
+    socketInstance.on("transactionFetched", (data) => {
+      console.log("Transaction fetched:", data.transaction);
+      setSelected(data.transaction); // Update the selected transaction
+    });
+
+    // Listen for serviceUpdated event
     socketInstance.on("serviceUpdated", (data) => {
       console.log("Service updated:", data);
 
-      // Update the selected transaction's services
       if (selected && selected._id === data.transactionID) {
         const updatedServices = selected.services.map((service) => {
           if (service.name === data.service) {
             return {
               ...service,
               servedBy: data.servedBy,
-              checkedBy: data.checkedBy, // Update checkedBy
+              checkedBy: data.checkedBy,
             };
           }
           return service;
@@ -129,6 +134,18 @@ export default function WorkPage() {
       socketInstance.disconnect();
     };
   }, [selected]);
+
+  // Function to handle selecting a transaction
+  function handleSelectTransaction(transaction: WorkEntry) {
+    if (socket) {
+      // Emit fetchTransaction event to the server
+      socket.emit("fetchTransaction", {
+        transactionID: transaction._id,
+      });
+    } else {
+      console.error("Socket is not connected");
+    }
+  }
 
   function handleSelecting(service: string, checked: boolean) {
     console.log("Selecting service:", service, checked);
@@ -177,8 +194,8 @@ export default function WorkPage() {
                     data.map((transaction) => (
                       <TableRow
                         key={transaction._id}
-                        className="border-b-2 border-black cursor-pointer "
-                        onClick={() => setSelected(transaction)}
+                        className="border-b-2 border-black cursor-pointer"
+                        onClick={() => handleSelectTransaction(transaction)} // Use handleSelectTransaction
                       >
                         <TableCell>
                           {transaction.date

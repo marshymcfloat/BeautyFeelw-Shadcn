@@ -10,7 +10,7 @@ import {
 
 export default function RecentTransactions() {
   return (
-    <div className="border-4 border-black rounded-md px-2 py-4 max-w-[400px] w-[90%] mx-auto my-4 ">
+    <div className="border-4 border-black rounded-md px-2 py-4 max-w-[400px] w-full  my-4 ">
       <Table>
         <TableCaption>Recent transactions for today.</TableCaption>
         <TableHeader>
@@ -21,7 +21,7 @@ export default function RecentTransactions() {
           </TableRow>
         </TableHeader>
         <TableBody>
-          <TableRow className=" bg-slate-100 w-full">
+          <TableRow className="  w-full">
             <TableCell className="w-[20%]  font-medium">INV001</TableCell>
             <TableCell className="truncate text-center max-w-[100px] overflow-hidden whitespace-nowrap">
               Daniel Canoy

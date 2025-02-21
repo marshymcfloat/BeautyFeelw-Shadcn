@@ -1,13 +1,36 @@
 export default function TransactionCount() {
   return (
-    <div className="w-[50%] min-w-[180px] flex flex-col justify-center relative items-center max-w-[250px] h-[25vh] shadow-lg border-4 border-black rounded-lg  px-2 py-4">
-      <span className="text-2xl font-bold absolute top-0 left-0 p-4">
-        Transactions
-      </span>
+    <>
+      <div className="md:hidden size-32 relative flex justify-center items-center  border-4 border-customBlack rounded-md">
+        <span className="text-lg absolute top-0  ml-2 font-bold ">
+          transaction
+        </span>
+        <span className="font-bold text-[60px]">
+          {String(new Date().getDate()).padStart(2, "0")}
+        </span>
+      </div>
 
-      <span className="font-bold text-[100px] text-center">
-        {String(new Date().getDate()).padStart(2, "0")}
-      </span>
-    </div>
+      <div className=" w-[40%] max-h-[180px] md:w-[50%] min-w-[180px] md:flex hidden flex-col justify-center relative items-center max-w-[250px] md:h-[25vh] shadow-lg border-4 border-black rounded-lg  px-2 py-4">
+        <span className="text-lg md:text-2xl font-bold absolute top-0 left-0 p-4">
+          Transactions
+        </span>
+
+        <span className="font-bold text-[100px] text-center">
+          {String(new Date().getDate()).padStart(2, "0")}
+        </span>
+      </div>
+    </>
   );
+}
+
+{
+  /* <div className="w-[40%] max-h-[180px] md:w-[50%] min-w-[180px] flex flex-col justify-center relative items-center max-w-[250px] md:h-[25vh] shadow-lg border-4 border-black rounded-lg  px-2 py-4">
+<span className="text-lg md:text-2xl font-bold absolute top-0 left-0 p-4">
+  Transactions
+</span>
+
+<span className="font-bold text-[100px] text-center">
+  {String(new Date().getDate()).padStart(2, "0")}
+</span>
+</div> */
 }

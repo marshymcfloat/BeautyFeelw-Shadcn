@@ -13,6 +13,8 @@ type TransactionFormState = {
   voucherCode: string;
   totalDiscount: number;
   grandTotal: number;
+  time: string;
+  date: string;
 };
 
 const initialState: TransactionFormState = {
@@ -22,6 +24,8 @@ const initialState: TransactionFormState = {
   voucherCode: "",
   totalDiscount: 0,
   grandTotal: 0,
+  time: "",
+  date: "",
 };
 
 export const transactionFormSlice = createSlice({
@@ -78,12 +82,20 @@ export const transactionFormSlice = createSlice({
     setVoucherCode(state, action) {
       state.voucherCode = action.payload;
     },
+    setTime(state, action) {
+      state.time = action.payload;
+    },
+    setDate(state, action) {
+      state.date = action.payload;
+    },
     resetState(state) {
       state.name = initialState.name;
       state.services = initialState.services;
       state.paymentMethod = initialState.paymentMethod;
       state.totalDiscount = initialState.totalDiscount;
       state.grandTotal = initialState.grandTotal;
+      state.date = initialState.date;
+      state.time = initialState.time;
     },
   },
 });

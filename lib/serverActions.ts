@@ -4,7 +4,10 @@ import Service from "@/lib/models/Service";
 import Set from "@/lib/models/Set";
 import Voucher from "@/lib/models/Voucher";
 import Transaction from "@/lib/models/Transaction";
+import Account from "@/lib/models/Account";
 import { connectDatabase } from "./models/Customer";
+import bcrypt from "bcrypt";
+
 import {
   formalizeName,
   checkCustomer,
@@ -14,6 +17,24 @@ type voucherData = {
   value?: number;
 };
 
+export async function getTransactionCount() {
+  try {
+    const startOfDay = new Date();
+    startOfDay.setHours(0, 0, 0, 0);
+
+    const endOfDay = new Date();
+    endOfDay.setHours(23, 59, 59, 999);
+
+    const transactionCount = await Transaction.countDocuments({
+      date: { $gte: startOfDay, $lt: endOfDay },
+    });
+
+    return transactionCount;
+  } catch (error) {
+    console.error("Error fetching transaction count:", error);
+    throw error;
+  }
+}
 export async function getServices(type: string) {
   try {
     await connectDatabase();
@@ -37,19 +58,27 @@ export async function getServices(type: string) {
 export async function voucherValidity(code: string): Promise<voucherData> {
   const foundCode = await Voucher.findOne({ code });
 
-  if (foundCode) {
+  if (foundCode && !foundCode.usedOn) {
     return { status: "valid", value: foundCode.value };
   } else {
     return { status: "invalid" };
   }
 }
+
 export async function transactionSubmit(formData: any) {
   if (!formData) {
     console.error("Error: No data submitted.");
     return { success: false, message: "No data submitted." };
   }
 
-  const { name, paymentMethod, services, grandTotal } = formData;
+  const { name, paymentMethod, voucherCode, services, grandTotal, date, time } =
+    formData;
+
+  const formmattedBookDateTime = new Date(`${date}T${time}`);
+
+  if (formmattedBookDateTime < new Date()) {
+    return { success: false, message: "Invalid date and time." };
+  }
 
   if (
     !name ||
@@ -66,20 +95,28 @@ export async function transactionSubmit(formData: any) {
     };
   }
 
+  if (voucherCode.trim() !== "") {
+    const foundVoucher = await Voucher.findOne({ code: voucherCode });
+
+    if (foundVoucher) {
+      await Voucher.findByIdAndUpdate(foundVoucher._id, { usedOn: new Date() });
+    }
+  }
+
   try {
     const newName: string = formalizeName(name);
 
-    // Ensure each service has a `checkedBy` field set to `null`
     const servicesWithCheckedBy = services.map((service) => ({
       ...service,
-      checkedBy: null, // Explicitly set checkedBy to null
+      checkedBy: null,
     }));
 
     const newTransaction = new Transaction({
       name: newName,
-      services: servicesWithCheckedBy, // Use the updated services array
+      services: servicesWithCheckedBy,
       paymentMethod,
       grandTotal,
+      bookDateAndTime: formmattedBookDateTime,
     });
 
     await newTransaction.save();
@@ -91,4 +128,32 @@ export async function transactionSubmit(formData: any) {
     console.error("Error saving transaction:", error);
     return { success: false, message: "Failed to save transaction." };
   }
+}
+
+export async function Login(credentials: {
+  username: string;
+  password: string;
+}) {
+  const { username, password } = credentials;
+
+  if (!username || !password) {
+    return { status: 400, message: "Username and password are required" };
+  }
+
+  const account = await Account.findOne({ username });
+
+  if (!account) {
+    return { status: 404, message: "Account not found" };
+  }
+
+  const isPasswordValid = await bcrypt.compare(password, account.password);
+  if (!isPasswordValid) {
+    return { status: 401, message: "Invalid password" };
+  }
+
+  return JSON.stringify({
+    status: 200,
+    _id: account._id,
+    role: account.role,
+  });
 }

@@ -31,6 +31,32 @@ connectDatabase()
 io.on("connection", (socket) => {
   console.log("A user connected:", socket.id);
 
+  // Listen for fetchTransaction event
+  socket.on("fetchTransaction", async (data) => {
+    const { transactionID } = data;
+
+    try {
+      // Find the transaction in the database
+      const foundTransaction = await Transaction.findById(transactionID);
+      if (!foundTransaction) {
+        return socket.emit("error", {
+          message: "Transaction not found.",
+        });
+      }
+
+      // Emit the transaction data back to the client
+      socket.emit("transactionFetched", {
+        transaction: foundTransaction,
+      });
+    } catch (error) {
+      console.error("Error fetching transaction:", error);
+      socket.emit("error", {
+        message: "An error occurred while fetching the transaction.",
+      });
+    }
+  });
+
+  // Existing selectService logic
   socket.on("selectService", async (data) => {
     console.log("Received data:", data);
 
@@ -81,12 +107,13 @@ io.on("connection", (socket) => {
       await foundTransaction.save();
       console.log("Transaction updated successfully.");
 
+      // Emit the updated transaction to all clients
       io.emit("serviceUpdated", {
         message: "Transaction updated successfully.",
         transactionID: data.transactionID,
         service: data.service,
         servedBy: foundTransaction.services[serviceIndex].servedBy,
-        checkedBy: foundTransaction.services[serviceIndex].checkedBy, // Include checkedBy
+        checkedBy: foundTransaction.services[serviceIndex].checkedBy,
       });
     } catch (error) {
       console.error("Error updating transaction:", error);

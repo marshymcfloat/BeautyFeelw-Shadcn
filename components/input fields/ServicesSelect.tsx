@@ -66,7 +66,7 @@ export default function ServicesSelect({ type }: { type: string }) {
         <SelectTrigger className="w-full h-[50px] border-2 border-black">
           <SelectValue placeholder="Select Services" />
         </SelectTrigger>
-        <SelectContent>
+        <SelectContent className="">
           {services.map((service: any) => (
             <SelectItem
               key={service._id}

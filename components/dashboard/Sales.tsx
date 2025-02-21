@@ -2,7 +2,14 @@
 
 import { Bar, BarChart, CartesianGrid, XAxis } from "recharts";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import {
   ChartConfig,
   ChartContainer,
@@ -31,14 +38,14 @@ const chartConfig = {
 
 export function Sales() {
   return (
-    <Card className="w-[90%] mx-auto">
+    <Card className="md:w-[90%] mx-auto">
       <CardHeader>
         <CardTitle className="text-center text-2xl tracking-widest">
           Sales
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <ChartContainer config={chartConfig} className="">
+        <ChartContainer config={chartConfig}>
           <BarChart accessibilityLayer data={chartData}>
             <CartesianGrid vertical={false} />
             <XAxis
@@ -49,14 +56,42 @@ export function Sales() {
               tickFormatter={(value) => value.slice(0, 3)}
             />
             <ChartTooltip
-              cursor={true}
-              content={<ChartTooltipContent indicator="dashed" />}
+              cursor={false}
+              content={<ChartTooltipContent hideLabel />}
             />
-            <Bar dataKey="desktop" fill="var(--color-desktop)" radius={4} />
-            <Bar dataKey="mobile" fill="var(--color-mobile)" radius={4} />
+            <Bar dataKey="desktop" fill="var(--color-desktop)" radius={8} />
           </BarChart>
         </ChartContainer>
       </CardContent>
     </Card>
   );
 }
+
+/* 
+<Card className="w-[90%] mx-auto">
+<CardHeader>
+  <CardTitle className="text-center text-2xl tracking-widest">
+    Sales
+  </CardTitle>
+</CardHeader>
+<CardContent>
+  <ChartContainer config={chartConfig} className="">
+    <BarChart accessibilityLayer data={chartData}>
+      <CartesianGrid vertical={false} />
+      <XAxis
+        dataKey="month"
+        tickLine={false}
+        tickMargin={10}
+        axisLine={false}
+        tickFormatter={(value) => value.slice(0, 3)}
+      />
+      <ChartTooltip
+        cursor={true}
+        content={<ChartTooltipContent indicator="dashed" />}
+      />
+      <Bar dataKey="desktop" fill="var(--color-desktop)" radius={4} />
+      <Bar dataKey="mobile" fill="var(--color-mobile)" radius={4} />
+    </BarChart>
+  </ChartContainer>
+</CardContent>
+</Card> */

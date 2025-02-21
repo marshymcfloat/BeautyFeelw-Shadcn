@@ -2,10 +2,12 @@ import { Provider } from "react-redux";
 import { configureStore } from "@reduxjs/toolkit";
 import { transactionFormSlice } from "../slices/TransactionFormSlice";
 import { modalSlice } from "../slices/ModalSlice";
+import { marketingModalSlice } from "../slices/marketing/MarketingModalSlice";
 const store = configureStore({
   reducer: {
     transactionForm: transactionFormSlice.reducer,
     modal: modalSlice.reducer,
+    marketingModal: marketingModalSlice.reducer,
   },
 });
 
